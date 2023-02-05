@@ -1,36 +1,36 @@
 const nanoid = require('nanoid')
 
-const notes = []
-
 const sleep = (ms) => new Promise(res => setTimeout(res, ms))
 
 module.exports = {
-  list: async () => {
+  notes: [],
+
+  async list () {
     await sleep(1000)
 
-    return notes
+    return this.notes
   },
 
-  add: async (dto) => {
+  async add (dto) {
     const note = {
       id: nanoid(),
       ...dto,
     }
 
-    notes.push(note)
+    this.notes.push(note)
 
     await sleep(1000)
 
     return note
   },
 
-  delete: async (id) => {
-    const index = notes.findIndex((note => note.id === id))
+  async delete (id) {
+    const index = this.notes.findIndex((note => note.id === id))
 
     if (index === -1) throw new Error('Note not found')
 
     await sleep(1000)
 
-    notes.splice(index, 1)
+    this.notes.splice(index, 1)
   }
 }
