@@ -1,36 +1,41 @@
-const nanoid = require('nanoid')
+const { ObjectId } = require("mongodb");
 
-const sleep = (ms) => new Promise(res => setTimeout(res, ms))
+const mapNote = (note) => {
+  const { _id: id, ...data } = note
+
+  return { id, ...data }
+}
 
 module.exports = {
-  notes: [],
+  collection: null,
+
+  async setCollection (collection) {
+    this.collection = collection
+  },
 
   async list () {
-    await sleep(1000)
+    const notes = await this.collection.find({}).toArray()
 
-    return this.notes
+    return notes.map(mapNote)
   },
 
   async add (dto) {
-    const note = {
-      id: nanoid(),
-      ...dto,
+    try {
+      await this.collection.insertOne(dto)
+
+      return mapNote(dto)
+    } catch (err) {
+      throw new Error(err.message)
     }
-
-    this.notes.push(note)
-
-    await sleep(1000)
-
-    return note
   },
 
   async delete (id) {
-    const index = this.notes.findIndex((note => note.id === id))
+    try {
+      const query = { _id: new ObjectId(id) };
 
-    if (index === -1) throw new Error('Note not found')
-
-    await sleep(1000)
-
-    this.notes.splice(index, 1)
+      await this.collection.deleteOne(query);
+    } catch (err) {
+      throw new Error(err.message)
+    }
   }
 }

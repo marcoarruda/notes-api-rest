@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const app = express()
 
 const notesService = require('./services/notes')
+const mongodb = require('./database/mongodb')
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -18,24 +19,39 @@ app.get(NOTES_URL, async (req, res) => {
 })
 
 app.post(NOTES_URL, async (req, res) => {
-  const note = await notesService.add(req.body)
+  try {
+    const note = await notesService.add(req.body)
 
-  res.status(201).json(note)
+    res.status(201).json(note)
+  } catch (error) {
+    res.status(404).json({ error })
+  }
+
 })
 
 app.delete(`${NOTES_URL}:id/`, async (req, res) => {
-  const noteId = req.params.id
-
   try {
+    const noteId = req.params.id
+
     await notesService.delete(noteId)
 
     res.status(204).send()
   } catch (err) {
-    res.status(404).send()
+    res.status(404).send(err.message)
   }
 })
 
 const port = 3000
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+app.listen(port, async () => {
+  try {
+    const mongoClient = await mongodb.connectToServer()
+    const db = mongoClient.db('dev')
+    const collection = db.collection('notes')
+
+    notesService.setCollection(collection)
+
+    console.log(`Example app listening on port ${port}`)
+  } catch (err) {
+    console.log(err)
+  }
 })
