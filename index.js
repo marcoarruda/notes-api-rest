@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 
 const app = express()
 
-const notesService = require('./services/notes')
+const notesService = require('./services/notes.service')
 const mongodb = require('./database/mongodb')
 
 app.use(cors())
