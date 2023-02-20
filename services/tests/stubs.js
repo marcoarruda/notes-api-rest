@@ -1,11 +1,8 @@
-const stubNote = (...data) => ({
-  note: 'some',
-  ...data,
+export const stubNote = (...data) => ({
+  _doc: {
+    note: 'some',
+    ...data,
+  }
 })
 
-const stubNotes = (length = 3) => Array.from({ length }, () => stubNote())
-
-export default {
-  stubNote,
-  stubNotes,
-}
+export const stubNotes = (length = 3) => Array.from({ length }, () => stubNote())

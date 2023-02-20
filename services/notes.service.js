@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 
 const mapNote = (note) => {
-  console.log(note)
   const { _id: id, ...data } = note._doc
 
   return { id, ...data }
