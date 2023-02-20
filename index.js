@@ -2,10 +2,11 @@ import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 
+import { connect } from './database/mongoose.js'
+
 const app = express()
 
 import notesService from './services/notes.service.js'
-import { connectToServer } from './database/mongodb.js'
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -26,7 +27,6 @@ app.post(NOTES_URL, async (req, res) => {
   } catch (error) {
     res.status(404).json({ error })
   }
-
 })
 
 app.delete(`${NOTES_URL}:id/`, async (req, res) => {
@@ -44,11 +44,9 @@ app.delete(`${NOTES_URL}:id/`, async (req, res) => {
 const port = 3000
 app.listen(port, async () => {
   try {
-    const mongoClient = await connectToServer()
-    const db = mongoClient.db('dev')
-    const collection = db.collection('notes')
+    const models = await connect()
 
-    notesService.setCollection(collection)
+    notesService.setModel(models.get('Note'))
 
     console.log(`Example app listening on port ${port}`)
   } catch (err) {

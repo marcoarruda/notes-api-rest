@@ -1,29 +1,33 @@
-import { ObjectId }  from "mongodb";
+import { ObjectId } from "mongodb";
 
 const mapNote = (note) => {
-  const { _id: id, ...data } = note
+  console.log(note)
+  const { _id: id, ...data } = note._doc
 
   return { id, ...data }
 }
 
 export default {
-  collection: null,
 
-  async setCollection (collection) {
-    this.collection = collection
+  model: null,
+
+  setModel(model) {
+    this.model = model
   },
 
   async list () {
-    const notes = await this.collection.find({}).toArray()
+    const notes = await this.model.find()
 
     return notes.map(mapNote)
   },
 
   async add (dto) {
     try {
-      await this.collection.insertOne(dto)
+      const note = new this.model({
+        ...dto
+      })
 
-      return mapNote(dto)
+      return mapNote(await note.save())
     } catch (err) {
       throw new Error(err.message)
     }
@@ -31,9 +35,11 @@ export default {
 
   async delete (id) {
     try {
-      const query = { _id: new ObjectId(id) };
+      const exists = (await this.model.countDocuments({ _id: id })) > 0
 
-      await this.collection.deleteOne(query);
+      if (exists) await this.model.deleteOne({ _id: id })
+
+      else throw new Error('Note not found')
     } catch (err) {
       throw new Error(err.message)
     }
