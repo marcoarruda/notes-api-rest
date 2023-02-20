@@ -5,7 +5,7 @@ const stubNote = (...data) => ({
 
 const stubNotes = (length = 3) => Array.from({ length }, () => stubNote())
 
-module.exports = {
+export default {
   stubNote,
   stubNotes,
 }

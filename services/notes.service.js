@@ -1,4 +1,4 @@
-const { ObjectId } = require("mongodb");
+import { ObjectId }  from "mongodb";
 
 const mapNote = (note) => {
   const { _id: id, ...data } = note
@@ -6,7 +6,7 @@ const mapNote = (note) => {
   return { id, ...data }
 }
 
-module.exports = {
+export default {
   collection: null,
 
   async setCollection (collection) {

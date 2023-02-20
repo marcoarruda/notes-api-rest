@@ -1,11 +1,11 @@
-const express = require('express')
-const cors = require('cors')
-const bodyParser = require('body-parser')
+import express from 'express'
+import cors from 'cors'
+import bodyParser from 'body-parser'
 
 const app = express()
 
-const notesService = require('./services/notes.service')
-const mongodb = require('./database/mongodb')
+import notesService from './services/notes.service.js'
+import { connectToServer } from './database/mongodb.js'
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -44,7 +44,7 @@ app.delete(`${NOTES_URL}:id/`, async (req, res) => {
 const port = 3000
 app.listen(port, async () => {
   try {
-    const mongoClient = await mongodb.connectToServer()
+    const mongoClient = await connectToServer()
     const db = mongoClient.db('dev')
     const collection = db.collection('notes')
 
