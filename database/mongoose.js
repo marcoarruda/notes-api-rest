@@ -7,7 +7,13 @@ import schemas from './schemas/index.js'
 export const connect = async () => {
   try {
     mongoose.set('strictQuery', true)
-    await mongoose.connect(`${connectionString}/${dbname}`, { useNewUrlParser: true })
+    await new Promise((res, rej) => mongoose.connect(`${connectionString}/${dbname}`, {
+      serverSelectionTimeoutMS: 500,
+    }, (err) => {
+      if (err) rej(err)
+
+      res()
+    }))
 
     const models = new Map()
     models.set('Note', mongoose.model('Note', schemas.NoteSchema))
