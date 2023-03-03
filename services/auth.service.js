@@ -4,10 +4,12 @@ export default {
   model: null,
 
   setModel (model) {
+    console.log('auth.setModel')
     this.model = model
   },
 
   async getUsers () {
+    console.log('auth.getUsers')
     const users = await this.model.find({})
 
     return users

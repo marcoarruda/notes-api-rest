@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 const mapNote = (note) => {
   const { _id: id, ...data } = note._doc
 
