@@ -1,3 +1,5 @@
+// @ts-check
+
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
@@ -7,19 +9,20 @@ import { connect } from './database/mongoose.js'
 const app = express()
 
 import notesService from './services/notes.service.js'
+import authService from './services/auth.service.js'
 
 app.use(cors())
 app.use(bodyParser.json())
 
-const NOTES_URL = '/api/v1/notes/'
+const API_URL = '/api/v1'
 
-app.get(NOTES_URL, async (req, res) => {
+app.get(`${API_URL}/notes/`, async (req, res) => {
   const notes = await notesService.list()
 
   res.status(200).json(notes)
 })
 
-app.post(NOTES_URL, async (req, res) => {
+app.post(`${API_URL}/notes/`, async (req, res) => {
   try {
     const note = await notesService.add(req.body)
 
@@ -29,7 +32,7 @@ app.post(NOTES_URL, async (req, res) => {
   }
 })
 
-app.delete(`${NOTES_URL}:id/`, async (req, res) => {
+app.delete(`${`${API_URL}/notes/`}:id/`, async (req, res) => {
   try {
     const noteId = req.params.id
 
@@ -41,12 +44,35 @@ app.delete(`${NOTES_URL}:id/`, async (req, res) => {
   }
 })
 
+app.get(`${API_URL}/users/`, async (req, res) => {
+  const users = await authService.getUsers()
+
+  res.status(200).json(users)
+})
+
+app.post(`${API_URL}/auth/register/`, async (req, res) => {
+  try {
+    await authService.register(req.body)
+
+    res.status(201).json()
+  } catch (err) {
+    res.status(401).json({ error: err.message })
+  }
+})
+
+app.post(`${API_URL}/auth/login/`, async (req, res) => {
+
+})
+
 const port = 3000
 app.listen(port, async () => {
   try {
     const models = await connect()
 
+    if (!models) throw new Error('Could not connect to Mongodb')
+
     notesService.setModel(models.get('Note'))
+    authService.setModel(models.get('User'))
 
     console.log(`Example app listening on port ${port}`)
   } catch (err) {
